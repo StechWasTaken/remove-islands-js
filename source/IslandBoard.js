@@ -95,9 +95,12 @@ export default class IslandBoard {
 
     async removeIslands() {
         const connected = new Set();
+        const nodes = new Set();
         const queue = new Queue();
 
-        for (const node of this.iterator()) {
+        for (const node of this.iterator()) if (node.isIsland()) nodes.add(node);
+        
+        for (const node of nodes) {
             node.element.classList.add("current");
             if (!node.isIsland() || connected.has(node)) {
                 await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
@@ -133,11 +136,13 @@ export default class IslandBoard {
                 for (const node of visited) {
                     node.makeWater();
                     node.element.classList.remove("search");
+                    nodes.delete(node);
                 }
             } else {
                 for (const node of visited) {
                     node.element.classList.remove("search");
                     connected.add(node);
+                    nodes.delete(node);
                 }
             }
         }
