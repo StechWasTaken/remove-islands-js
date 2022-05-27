@@ -1,14 +1,14 @@
-class Node {
+class Entry {
     next = null;
-    entry = null;
+    item = null;
 
     /**
      * 
-     * @param {any} entry 
+     * @param {any} item 
      */
-    constructor(entry) {
+    constructor(item) {
         this.next = null;
-        this.entry = entry;
+        this.item = item;
     }
 }
 
@@ -22,11 +22,11 @@ export default class Queue {
 
     /**
      * 
-     * @param {any} entry 
+     * @param {any} item 
      * @returns 
      */
-    add(entry) {
-        const node = new Node(entry);
+    add(item) {
+        const node = new Entry(item);
 
         if (!this.first) {
             this.first = node;
@@ -45,7 +45,7 @@ export default class Queue {
      */
     remove() {
         if (this.length == 0) return null;
-        const element = this.first.entry;
+        const element = this.first.item;
         this.first = this.first?.next;
         this.length--;
         return element;

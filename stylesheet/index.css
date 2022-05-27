@@ -32,3 +32,11 @@ body {
 .water {
     background-color: blue;
 }
+
+.search {
+    background-color: green;
+}
+
+.current {
+    background-color: red;
+}

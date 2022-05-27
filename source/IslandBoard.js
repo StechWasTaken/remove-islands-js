@@ -95,19 +95,29 @@ export default class IslandBoard {
 
     async removeIslands() {
         const connected = new Set();
+        const queue = new Queue();
 
         for (const node of this.iterator()) {
-            if (!node.isIsland() || connected.has(node)) continue;
+            node.element.classList.add("current");
+            if (!node.isIsland() || connected.has(node)) {
+                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
+                node.element.classList.remove("current");
+                continue;
+            }
 
-            const queue = new Queue();
             const visited = new Set();
 
             queue.add(node);
             visited.add(node);
+            node.element.classList.add("search");
 
             while (!queue.isEmpty()) {
                 const current = queue.remove();
                 const neighbors = this.getNeighbors(current);
+
+                current.element.classList.add("current");
+                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
+                current.element.classList.remove("current");
 
                 if (neighbors.length < 4) connected.add(node);
 
@@ -115,16 +125,18 @@ export default class IslandBoard {
                     if (!neighbor.isIsland() || visited.has(neighbor)) continue;
                     visited.add(neighbor);
                     queue.add(neighbor);
+                    neighbor.element.classList.add("search");
                 }
             }
 
             if (!connected.has(node)) {
                 for (const node of visited) {
                     node.makeWater();
-                    await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
+                    node.element.classList.remove("search");
                 }
             } else {
                 for (const node of visited) {
+                    node.element.classList.remove("search");
                     connected.add(node);
                 }
             }
