@@ -1,4 +1,4 @@
-export default class IslandNode {
+export default class BoardNode {
     constructor(position) {
         this.element = document.createElement("div");
         this.element.classList.add("node");
@@ -10,17 +10,17 @@ export default class IslandNode {
      * 
      * @returns {Boolean}
      */
-    isIsland() {
-        return this.element.classList.contains("island");
+    isLand() {
+        return this.element.classList.contains("land");
     }
     
-    makeIsland() {
+    makeLand() {
         this.element.classList.remove("water");
-        this.element.classList.add("island");
+        this.element.classList.add("land");
     }
 
     makeWater() {
-        this.element.classList.remove("island");
+        this.element.classList.remove("land");
         this.element.classList.add("water");
     }
 }

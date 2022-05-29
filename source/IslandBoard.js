@@ -1,4 +1,4 @@
-import IslandNode from "./IslandNode.js";
+import BoardNode from "./BoardNode.js";
 import Queue from "./Queue.js";
 
 const TIMEOUT_TIME = 1;
@@ -9,24 +9,11 @@ export default class IslandBoard {
         this.board = [];
 
         for (let i = 0; i < this.size * this.size; i++) {
-            const node = new IslandNode(i);
+            const node = new BoardNode(i);
 
-            if (Math.random() > 0.46) node.makeIsland();
+            if (Math.random() < 1.15 * Math.random()) node.makeLand();
 
             this.board[i] = node;
-        }
-
-        for (const node of this.iterator()) {
-            if (node.isIsland()) continue;
-            const neighbors = this.getNeighbors(node);
-
-            let count = 0;
-            for (const neighbor of neighbors) {
-                if (!neighbor.isIsland()) continue;
-                count++;
-            }
-
-            if (count == neighbors.length) node.makeIsland();
         }
     }
 
@@ -94,57 +81,64 @@ export default class IslandBoard {
     }
 
     async removeIslands() {
-        const connected = new Set();
+        const search = new Set();
         const nodes = new Set();
         const queue = new Queue();
 
-        for (const node of this.iterator()) if (node.isIsland()) nodes.add(node);
+        for (const node of this.iterator()) if (node.isLand()) nodes.add(node);
         
-        for (const node of nodes) {
-            node.element.classList.add("current");
-            if (!node.isIsland() || connected.has(node)) {
-                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
-                node.element.classList.remove("current");
-                continue;
-            }
-
+        for (let i = 0; i < this.size; i++) {
+            const node1 = this.board[i];
+            const node2 = this.board[(this.size - 1) * this.size + i];
+            const node3 = this.board[i * this.size];
+            const node4 = this.board[i * this.size + this.size - 1];
+            if (node1.isLand()) search.add(node1);
+            if (node2.isLand()) search.add(node2);
+            if (node3.isLand()) search.add(node3);
+            if (node4.isLand()) search.add(node4);
+        }
+        
+        for (const node of search) {
             const visited = new Set();
 
             queue.add(node);
             visited.add(node);
-            node.element.classList.add("search");
 
             while (!queue.isEmpty()) {
                 const current = queue.remove();
                 const neighbors = this.getNeighbors(current);
 
-                current.element.classList.add("current");
-                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
-                current.element.classList.remove("current");
+                current.element.classList.add("search");
 
-                if (neighbors.length < 4) connected.add(node);
+                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
+
+                nodes.delete(current);
+                search.delete(current);
 
                 for (const neighbor of neighbors) {
-                    if (!neighbor.isIsland() || visited.has(neighbor)) continue;
+                    if (!neighbor.isLand() || visited.has(neighbor)) continue;
                     visited.add(neighbor);
                     queue.add(neighbor);
-                    neighbor.element.classList.add("search");
                 }
             }
+        }
 
-            if (!connected.has(node)) {
-                for (const node of visited) {
-                    node.makeWater();
-                    node.element.classList.remove("search");
-                    nodes.delete(node);
-                }
-            } else {
-                for (const node of visited) {
-                    node.element.classList.remove("search");
-                    connected.add(node);
-                    nodes.delete(node);
-                }
+        let previous = null;
+        for (const node of nodes) {
+            node.makeWater();
+            if (Math.floor(previous?.position / this.size) < Math.floor(node.position / this.size)) {
+                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
             }
+            previous = node;
+        }
+
+        previous = null;
+        for (const node of this.iterator()) {
+            node.element.classList.remove("search");
+            if (Math.floor(previous?.position / this.size) < Math.floor(node.position / this.size)) {
+                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
+            }
+            previous = node;
         }
     }
 }

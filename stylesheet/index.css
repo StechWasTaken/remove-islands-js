@@ -25,9 +25,10 @@ body {
     background-color: white;
     width: var(--node-size);
     height: var(--node-size);
+    transition: 1s all;
 }
 
-.island {
+.land {
     background-color: orange;   
 }
 
