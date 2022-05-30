@@ -84,7 +84,6 @@ export default class IslandBoard {
         const search = new Set();
         const nodes = new Set();
         const visited = new Set();
-        const queue = new Queue();
 
         for (const node of this.iterator()) if (node.isLand()) nodes.add(node);
         
@@ -103,6 +102,7 @@ export default class IslandBoard {
 
         for (const node of search) {
             promises.push(new Promise(async (resolve) => {
+                const queue = new Queue();
                 queue.add(node);
                 visited.add(node);
 
