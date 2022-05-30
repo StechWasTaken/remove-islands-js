@@ -129,22 +129,12 @@ export default class IslandBoard {
 
         await Promise.all(promises);
 
-        let previous = null;
         for (const node of nodes) {
             node.makeWater();
-            if (Math.floor(previous?.position / this.size) < Math.floor(node.position / this.size)) {
-                // await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
-            }
-            previous = node;
         }
 
-        previous = null;
         for (const node of this.iterator()) {
             node.element.classList.remove("search");
-            if (Math.floor(previous?.position / this.size) < Math.floor(node.position / this.size)) {
-                // await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
-            }
-            previous = node;
         }
     }
 }
