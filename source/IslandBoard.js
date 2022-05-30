@@ -83,6 +83,7 @@ export default class IslandBoard {
     async removeIslands() {
         const search = new Set();
         const nodes = new Set();
+        const visited = new Set();
         const queue = new Queue();
 
         for (const node of this.iterator()) if (node.isLand()) nodes.add(node);
@@ -97,37 +98,42 @@ export default class IslandBoard {
             if (node3.isLand()) search.add(node3);
             if (node4.isLand()) search.add(node4);
         }
-        
+
+        const promises = [];
+
         for (const node of search) {
-            const visited = new Set();
+            promises.push(new Promise(async (resolve) => {
+                queue.add(node);
+                visited.add(node);
 
-            queue.add(node);
-            visited.add(node);
+                while (!queue.isEmpty()) {
+                    const current = queue.remove();
+                    const neighbors = this.getNeighbors(current);
 
-            while (!queue.isEmpty()) {
-                const current = queue.remove();
-                const neighbors = this.getNeighbors(current);
+                    current.element.classList.add("search");
 
-                current.element.classList.add("search");
+                    await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
 
-                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
+                    nodes.delete(current);
 
-                nodes.delete(current);
-                search.delete(current);
-
-                for (const neighbor of neighbors) {
-                    if (!neighbor.isLand() || visited.has(neighbor)) continue;
-                    visited.add(neighbor);
-                    queue.add(neighbor);
+                    for (const neighbor of neighbors) {
+                        if (!neighbor.isLand() || visited.has(neighbor)) continue;
+                        visited.add(neighbor);
+                        queue.add(neighbor);
+                    }
                 }
-            }
+
+                resolve();
+            }));
         }
+
+        await Promise.all(promises);
 
         let previous = null;
         for (const node of nodes) {
             node.makeWater();
             if (Math.floor(previous?.position / this.size) < Math.floor(node.position / this.size)) {
-                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
+                // await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
             }
             previous = node;
         }
@@ -136,7 +142,7 @@ export default class IslandBoard {
         for (const node of this.iterator()) {
             node.element.classList.remove("search");
             if (Math.floor(previous?.position / this.size) < Math.floor(node.position / this.size)) {
-                await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
+                // await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
             }
             previous = node;
         }
