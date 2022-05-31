@@ -1,7 +1,19 @@
 import BoardNode from "./BoardNode.js";
 import Queue from "./Queue.js";
 
-const TIMEOUT_TIME = 1;
+/**
+ * 
+ * @param {any} resolve 
+ */
+const TIMEOUT_TIME = async (resolve) => {
+    const time = parseInt(document.getElementById("slider").value);
+
+    if (time !== 0) {
+        await new Promise(resolve => setTimeout(resolve, time));
+    }
+
+    resolve();
+};
 
 export default class IslandBoard {
     constructor(size) {
@@ -112,7 +124,7 @@ export default class IslandBoard {
 
                     current.element.classList.add("search");
 
-                    await new Promise(resolve => setTimeout(resolve, TIMEOUT_TIME));
+                    await new Promise(resolve => TIMEOUT_TIME(resolve));
 
                     nodes.delete(current);
 

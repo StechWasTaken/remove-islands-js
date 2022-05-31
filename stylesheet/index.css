@@ -10,6 +10,17 @@ body {
     height: 100vh;
 }
 
+.form {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 10px;
+    width: 300px;
+}
+
 .board {
     --board-size: 100vmin;
     display: flex;
